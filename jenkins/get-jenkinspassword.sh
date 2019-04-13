@@ -1,0 +1,1 @@
+kubectl exec `kubectl get pods -l app=myjenkins|grep myjenkins|awk '{print $1}'` cat  /var/jenkins_home/secrets/initialAdminPassword
