@@ -13,7 +13,6 @@ minikube config set memory 8192
 minikube config set cpus 3
 
 minikube start
-minikube ssh -- "mkdir -p /tmp/m2 && sudo chmod 777 /tmp/m2"
 
 kubectl create namespace cicd
 
