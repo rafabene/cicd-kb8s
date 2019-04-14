@@ -20,13 +20,6 @@ git clone https://github.com/rafabene/cicd-kb8s/
 cd cicd-kb8s/
 ```
 
-## Create the Jenkins slave image
-
-```
-cd jenkins-slave
-./build-docker.sh
-```
-
 ## Deploy Jenkins
 
 ```
