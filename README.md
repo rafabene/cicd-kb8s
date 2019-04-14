@@ -1,4 +1,4 @@
-# cicd-kb8s
+# CI/CD example on Kubernetes
 Example of Quarkus CI/CD application using Jenkins on Kubernetes
 
 ## Requirenments
