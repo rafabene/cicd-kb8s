@@ -42,12 +42,12 @@ cd jenkins/
 
 ```
 
-Perform a build using Jenkins
+Perform the first build manually using Jenkins. This will enable the SCM polling.
 
 ## Open the application
 
 ```
-cd ola-mundo
+cd ola-mundo/
 ./open-app.sh
 ```
 
