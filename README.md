@@ -13,6 +13,7 @@ minikube config set memory 8192
 minikube config set cpus 3
 
 minikube start
+minikube ssh -- mkdir -p /tmp/m2
 
 kubectl create namespace cicd
 
@@ -33,11 +34,8 @@ cd jenkins-slave
 ```
 cd jenkins/
 
-# Build Docker image
-./build-docker.sh
-
-# Deploy Jenkins on Kubernetes
-./deploy-kb8s.sh
+# Build and deploy Jenkins
+./deploy-jenkins.sh
 
 # Open Jenkins Console
 ./open-jenkins.sh
