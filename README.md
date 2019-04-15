@@ -40,11 +40,15 @@ cd jenkins/
 # Open Jenkins Console
 ./open-jenkins.sh
 
-# If you need the Jenkins password, run
-./get-jenkinspassword.sh
-
 ```
 
+Perform a build using Jenkins
 
+## Open the application
+
+```
+cd ola-mundo
+./open-app.sh
+```
 
 
