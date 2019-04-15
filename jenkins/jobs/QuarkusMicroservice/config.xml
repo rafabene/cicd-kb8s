@@ -17,76 +17,25 @@
       </triggers>
     </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.66">
-    <script>podTemplate(label: &quot;mymaven&quot;, 
-yaml: &quot;&quot;&quot;
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: maven
-    image: rafabene/jenkins-slave
-    imagePullPolicy: IfNotPresent
-    tty: true
-    command: [&quot;cat&quot;]
-    volumeMounts:
-    - name: dockersock
-      mountPath: /var/run/docker.sock
-    - name: m2
-      mountPath: /home/jenkins/.m2
-  volumes:
-  - name: dockersock
-    hostPath:
-      path: /var/run/docker.sock
-  - name: m2
-    hostPath:
-      path: /tmp/m2
-&quot;&quot;&quot;
-  ) {
-    node (&quot;mymaven&quot;){
-        container(&quot;maven&quot;){
-           stage (&apos;SCM checkout&apos;){
-                echo &apos;Checking out git repository&apos;
-                sh &apos;git clone https://github.com/rafabene/cicd-kb8s&apos;
-            }
-        
-            stage (&apos;Maven native build&apos;){
-                echo &apos;Building native binary&apos;
-                dir(&apos;cicd-kb8s/ola-mundo&apos;) {
-                    sh &apos;mvn package -Pnative -DskipTests&apos;
-                }       
-            }
-
-            stage (&apos;Docker image build&apos;){
-                echo &apos;Building docker image&apos;
-                dir(&apos;cicd-kb8s/ola-mundo&apos;) {
-                    sh &apos;docker build -t rafabene/cloudnative -f src/main/docker/Dockerfile.native .&apos;
-                }       
-            }
-
-            stage (&apos;Perform Tests&apos;){
-                echo &apos;Building native binary&apos;
-                dir(&apos;cicd-kb8s/ola-mundo&apos;) {
-                    sh &apos;mvn test&apos;
-                }       
-            }
-            
-            stage (&apos;Wait for approval&apos;){
-                input &apos;Approve deployment?&apos;
-            }
-
-            stage (&apos;Deploy&apos;){
-                echo &apos;Building native binary&apos;
-                dir(&apos;cicd-kb8s/ola-mundo&apos;) {
-                    sh &apos;kubectl apply -f Deployment.yaml&apos;
-                    sh &apos;kubectl apply -f Service.yaml&apos;
-                    sh &quot;&quot;&quot;kubectl patch deployment cloudnative -p &apos;{&quot;spec&quot;:{&quot;template&quot;:{&quot;metadata&quot;:{&quot;labels&quot;:{ &quot;build&quot;: &quot;${env.BUILD_NUMBER}&quot;}}}}}&apos; &quot;&quot;&quot;
-               }       
-            }
-        }    
-    }
-}</script>
-    <sandbox>true</sandbox>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.66">
+    <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.3">
+      <configVersion>2</configVersion>
+      <userRemoteConfigs>
+        <hudson.plugins.git.UserRemoteConfig>
+          <url>https://github.com/rafabene/cicd-kb8s</url>
+        </hudson.plugins.git.UserRemoteConfig>
+      </userRemoteConfigs>
+      <branches>
+        <hudson.plugins.git.BranchSpec>
+          <name>*/master</name>
+        </hudson.plugins.git.BranchSpec>
+      </branches>
+      <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+      <submoduleCfg class="list"/>
+      <extensions/>
+    </scm>
+    <scriptPath>ola-mundo/Jenkinsfile</scriptPath>
+    <lightweight>true</lightweight>
   </definition>
   <triggers/>
   <disabled>false</disabled>
