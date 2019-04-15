@@ -19,8 +19,6 @@
   </properties>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.66">
     <script>podTemplate(label: &quot;mymaven&quot;, 
-ttyEnabled: &quot;yes&quot;, 
-privileged: true,
 yaml: &quot;&quot;&quot;
 apiVersion: v1
 kind: Pod
@@ -82,7 +80,8 @@ spec:
                 dir(&apos;cicd-kb8s/ola-mundo&apos;) {
                     sh &apos;kubectl apply -f Deployment.yaml&apos;
                     sh &apos;kubectl apply -f Service.yaml&apos;
-                }       
+                    sh &quot;&quot;&quot;kubectl patch deployment cloudnative -p &apos;{&quot;spec&quot;:{&quot;template&quot;:{&quot;metadata&quot;:{&quot;labels&quot;:{ &quot;build&quot;: &quot;${env.BUILD_NUMBER}&quot;}}}}}&apos; &quot;&quot;&quot;
+               }       
             }
         }    
     }
