@@ -1,0 +1,94 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.32">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.4">
+      <projectUrl>https://github.com/rafabene/cicd-kb8s/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers>
+        <hudson.triggers.SCMTrigger>
+          <spec>*/1 * * * * </spec>
+          <ignorePostCommitHooks>false</ignorePostCommitHooks>
+        </hudson.triggers.SCMTrigger>
+      </triggers>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.66">
+    <script>podTemplate(label: &quot;mymaven&quot;, 
+ttyEnabled: &quot;yes&quot;, 
+privileged: true,
+yaml: &quot;&quot;&quot;
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: maven
+    image: rafabene/jenkins-slave
+    imagePullPolicy: IfNotPresent
+    tty: true
+    command: [&quot;cat&quot;]
+    volumeMounts:
+    - name: dockersock
+      mountPath: /var/run/docker.sock
+    - name: m2
+      mountPath: /home/jenkins/.m2
+  volumes:
+  - name: dockersock
+    hostPath:
+      path: /var/run/docker.sock
+  - name: m2
+    hostPath:
+      path: /tmp/m2
+&quot;&quot;&quot;
+  ) {
+    node (&quot;mymaven&quot;){
+        container(&quot;maven&quot;){
+           stage (&apos;SCM checkout&apos;){
+                echo &apos;Checking out git repository&apos;
+                sh &apos;git clone https://github.com/rafabene/cicd-kb8s&apos;
+            }
+        
+            stage (&apos;Maven native build&apos;){
+                echo &apos;Building native binary&apos;
+                dir(&apos;cicd-kb8s/ola-mundo&apos;) {
+                    sh &apos;mvn package -Pnative -DskipTests&apos;
+                }       
+            }
+
+            stage (&apos;Docker image build&apos;){
+                echo &apos;Building docker image&apos;
+                dir(&apos;cicd-kb8s/ola-mundo&apos;) {
+                    sh &apos;docker build -t rafabene/cloudnative -f src/main/docker/Dockerfile.native .&apos;
+                }       
+            }
+
+            stage (&apos;Perform Tests&apos;){
+                echo &apos;Building native binary&apos;
+                dir(&apos;cicd-kb8s/ola-mundo&apos;) {
+                    sh &apos;mvn test&apos;
+                }       
+            }
+            
+            stage (&apos;Wait for approval&apos;){
+                input &apos;Approve deployment?&apos;
+            }
+
+            stage (&apos;Deploy&apos;){
+                echo &apos;Building native binary&apos;
+                dir(&apos;cicd-kb8s/ola-mundo&apos;) {
+                    sh &apos;kubectl apply -f Deployment.yaml&apos;
+                    sh &apos;kubectl apply -f Service.yaml&apos;
+                }       
+            }
+        }    
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
