@@ -1,0 +1,70 @@
+podTemplate(label: "mymaven", 
+yaml: """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: maven
+    image: rafabene/jenkins-slave
+    imagePullPolicy: IfNotPresent
+    tty: true
+    command: ["cat"]
+    volumeMounts:
+    - name: dockersock
+      mountPath: /var/run/docker.sock
+    - name: m2
+      mountPath: /home/jenkins/.m2
+  volumes:
+  - name: dockersock
+    hostPath:
+      path: /var/run/docker.sock
+  - name: m2
+    hostPath:
+      path: /tmp/m2
+"""
+  ) {
+    properties([pipelineTriggers([pollSCM('*/1 * * * * ')])])
+    node ("mymaven"){
+        
+        container("maven"){
+           stage ('SCM checkout'){
+                echo 'Checking out git repository'
+                git poll: true, url: 'https://github.com/rafabene/cicd-kb8s'
+            }
+        
+            stage ('Maven native build'){
+                echo 'Building native binary'
+                dir('webstore') {
+                    sh 'mvn package -Pnative -DskipTests'
+                }       
+            }
+
+            stage ('Docker image build'){
+                echo 'Building docker image'
+                dir('webstore') {
+                    sh 'docker build -t rafabene/cloudnative -f src/main/docker/Dockerfile.native .'
+                }       
+            }
+
+            stage ('Perform Tests'){
+                echo 'Building native binary'
+                dir('webstore') {
+                    sh 'mvn test'
+                }       
+            }
+            
+            stage ('Wait for approval'){
+                input 'Approve deployment?'
+            }
+
+            stage ('Deploy'){
+                echo 'Building native binary'
+                dir('webstore') {
+                    sh 'kubectl apply -f Deployment.yaml'
+                    sh 'kubectl apply -f Service.yaml'
+                    sh """kubectl patch deployment cloudnative -p '{"spec":{"template":{"metadata":{"labels":{ "build": "${env.BUILD_NUMBER}"}}}}}' """
+                }       
+            }
+        }    
+    }
+}

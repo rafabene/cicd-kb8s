@@ -34,7 +34,7 @@
       <submoduleCfg class="list"/>
       <extensions/>
     </scm>
-    <scriptPath>ola-mundo/Jenkinsfile</scriptPath>
+    <scriptPath>webstore/Jenkinsfile</scriptPath>
     <lightweight>true</lightweight>
   </definition>
   <triggers/>

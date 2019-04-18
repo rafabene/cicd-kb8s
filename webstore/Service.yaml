@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: cicd
+  name: cloudnative
+spec:
+  selector:
+    app: cloudnative
+  type: NodePort
+  ports:
+  - protocol: TCP
+    name: default-port
+    port: 8080
+    targetPort: 8080
