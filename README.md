@@ -9,6 +9,7 @@ Example of Quarkus CI/CD application using Jenkins on Kubernetes
 
 ```
 minikube profile cicd
+minikube addons enable metrics-server
 minikube config set memory 8192
 minikube config set cpus 3
 

@@ -19,5 +19,8 @@ spec:
       - name: cloudnative
         image: rafabene/cloudnative
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 0.5
         ports:
         - containerPort: 8080
