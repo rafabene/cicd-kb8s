@@ -48,8 +48,15 @@ Perform the first build manually using Jenkins. This will enable the SCM polling
 ## Open the application
 
 ```
-cd ola-mundo/
+cd webstore/
 ./open-app.sh
 ```
 
+# If you want to deploy just the application
 
+```
+cd webstore
+mvn package -Pnative -Dnative-image.docker-build=true  -DskipTests
+docker build -t rafabene/cloudnative -f src/main/docker/Dockerfile.native .
+kubectl create -f Deployment.yaml -f Service.yaml
+```
