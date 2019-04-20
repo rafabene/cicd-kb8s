@@ -13,9 +13,10 @@ minikube addons enable metrics-server
 minikube config set memory 8192
 minikube config set cpus 3
 
-minikube start --extra-config=controller-manager.horizontal-pod-autoscaler-upscale-delay=30s \
-  --extra-config=controller-manager.horizontal-pod-autoscaler-downscale-delay=1m \
-  --extra-config=controller-manager.horizontal-pod-autoscaler-sync-period=10s
+minikube start \
+  --extra-config=controller-manager.horizontal-pod-autoscaler-downscale-stabilization=30s \
+  --extra-config=controller-manager.horizontal-pod-autoscaler-cpu-initialization-period=30s \
+  --extra-config=controller-manager.horizontal-pod-autoscaler-sync-period=10s 
 minikube ssh -- "mkdir -p /tmp/m2 && sudo chmod 777 /tmp/m2"
 
 kubectl create namespace cicd
