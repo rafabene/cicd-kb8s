@@ -55,9 +55,10 @@ cd webstore/
 # If you want to deploy just the application without Jenkins
 
 ```
-cd webstore
+cd webstore/
 mvn package -Pnative -Dnative-image.docker-build=true  -DskipTests
 eval $(minikube docker-env)
 docker build -t rafabene/cloudnative -f src/main/docker/Dockerfile.native .
 kubectl create -f Deployment.yaml -f Service.yaml
+./open-app.sh
 ```
