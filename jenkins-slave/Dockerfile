@@ -18,9 +18,10 @@ apt-get -y install docker-ce
 RUN apt-get install -y docker-ce
 RUN usermod -a -G docker jenkins
 
-RUN wget https://github.com/oracle/graal/releases/download/vm-1.0.0-rc15/graalvm-ce-1.0.0-rc15-linux-amd64.tar.gz && tar zxvf graalvm-ce-1.0.0-rc15-linux-amd64.tar.gz
+RUN wget -c https://github.com/oracle/graal/releases/download/vm-19.2.1/graalvm-ce-linux-amd64-19.2.1.tar.gz && tar zxvf graalvm-ce-linux-amd64-19.2.1.tar.gz
 
-ENV GRAALVM_HOME=/graalvm-ce-1.0.0-rc15
+ENV GRAALVM_HOME=/graalvm-ce-19.2.1
+RUN $GRAALVM_HOME/bin/gu install native-image
 
 RUN export PATH=$GRAALVM_HOME/bin:$PATH
 

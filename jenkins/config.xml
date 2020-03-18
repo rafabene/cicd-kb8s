@@ -24,7 +24,7 @@
       <skipTlsVerify>false</skipTlsVerify>
       <addMasterProxyEnvVars>false</addMasterProxyEnvVars>
       <capOnlyOnAlivePods>false</capOnlyOnAlivePods>
-      <jenkinsUrl>http://${KB8IP}:8080</jenkinsUrl>
+      <jenkinsUrl>http://jenkins.cicd.svc.cluster.local:8080</jenkinsUrl>
       <containerCap>10</containerCap>
       <retentionTimeout>5</retentionTimeout>
       <connectTimeout>5</connectTimeout>
